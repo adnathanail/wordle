@@ -68,9 +68,9 @@ def filter_words(known_letters, known_not_letters, known_not_words, fixed_letter
 
 words_we_care_about = filter_words(
     known_letters={},
-    known_not_letters={},
+    known_not_letters={"a", "s", "e", "t", "n", "c", "g", "w", "l", "d", "u", "k"},
     known_not_words={},
-    fixed_letters=[None, None, None, None, None],
+    fixed_letters=[None, "r", "o", None, None],
     words_to_filter=get_initial_words()
 )
 ranked_letters = get_letters_by_rank(words_we_care_about)
