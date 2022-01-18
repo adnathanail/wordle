@@ -16,6 +16,27 @@ def get_initial_words():
 
     return out
 
+def filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, words_to_filter):
+    out = []
+
+    for word in words_to_filter:
+        if word in known_not_words:
+            continue
+        good = True
+        for letter in known_letters:
+            if letter not in word:
+                good = False
+        for letter in known_not_letters:
+            if letter in word:
+                good = False
+        for ind, letter in enumerate(fixed_letters):
+            if letter is not None and word[ind] != letter:
+                good = False
+        if good:
+            out.append(word)
+
+    return out
+
 def get_letters_by_rank(words):
     letter_tallies = {}
 
@@ -44,27 +65,6 @@ def get_best_word(letters_by_rank, possible_words):
             best_word = word
             best_word_score = score
     return best_word
-
-def filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, words_to_filter):
-    out = []
-
-    for word in words_to_filter:
-        if word in known_not_words:
-            continue
-        good = True
-        for letter in known_letters:
-            if letter not in word:
-                good = False
-        for letter in known_not_letters:
-            if letter in word:
-                good = False
-        for ind, letter in enumerate(fixed_letters):
-            if letter is not None and word[ind] != letter:
-                good = False
-        if good:
-            out.append(word)
-
-    return out
 
 words_we_care_about = filter_words(
     known_letters={},
