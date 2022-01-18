@@ -45,6 +45,36 @@ def get_best_word(letters_by_rank, possible_words):
             best_word_score = score
     return best_word
 
+def filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, words):
+    out = []
+
+    for word in words:
+        if word in ["arose", "aster", "hirse"]:
+            continue
+        good = True
+        for letter in known_letters:
+            if letter not in word:
+                good = False
+        for letter in known_not_letters:
+            if letter in word:
+                good = False
+        # for letter, index in enumerate(fixed_letters):
+        #     if letter is not None and word[index] != letter:
+        #         good = False
+        if good:
+            out.append(word)
+
+    return out
+
 words_we_care_about = get_initial_words()
+ranked_letters = get_letters_by_rank(words_we_care_about)
+# print(get_best_word(ranked_letters, words_we_care_about))
+
+known = {"r", "s", "e"}
+known_not_letters = {"a", "t", "o", "p", "u"}
+fixed = [None, None, None, None, "e"]
+not_words = {"arose"}
+
+words_we_care_about = filter_words(known, known_not_letters, fixed, not_words, words_we_care_about)
 ranked_letters = get_letters_by_rank(words_we_care_about)
 print(get_best_word(ranked_letters, words_we_care_about))
