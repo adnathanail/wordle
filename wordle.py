@@ -49,7 +49,9 @@ def get_letters_by_rank(words):
 
     return [item[0] for item in sorted(letter_tallies.items(), key=lambda x: x[1])]
 
-def get_best_word(letters_by_rank, possible_words):
+def get_best_word(possible_words):
+    letters_by_rank = get_letters_by_rank(possible_words)
+
     best_word = ""
     best_word_score = 0
 
@@ -73,5 +75,4 @@ words_we_care_about = filter_words(
     fixed_letters=[None, "r", "o", None, None],
     words_to_filter=get_initial_words()
 )
-ranked_letters = get_letters_by_rank(words_we_care_about)
-print(get_best_word(ranked_letters, words_we_care_about))
+print(get_best_word(words_we_care_about))
