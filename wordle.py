@@ -106,6 +106,6 @@ def play():
 
         current_words = filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, current_words)
 
-    print("SUCCESS!!")
+    print("\nSUCCESS!!")
 
 play()
