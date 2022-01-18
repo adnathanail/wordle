@@ -68,11 +68,44 @@ def get_best_word(possible_words):
             best_word_score = score
     return best_word
 
-words_we_care_about = filter_words(
-    known_letters={},
-    known_not_letters={"a", "s", "e", "t", "n", "c", "g", "w", "l", "d", "u", "k"},
-    known_not_words={},
-    fixed_letters=[None, "r", "o", None, None],
-    words_to_filter=get_initial_words()
-)
-print(get_best_word(words_we_care_about))
+def get_input(prompt, allowed_values):
+    result = input(prompt)
+    while result not in allowed_values:
+        print("Invalid value\n")
+        result = input(prompt)
+    return result
+
+def play():
+    current_words = get_initial_words()
+    known_letters = set()
+    known_not_letters=set()
+    known_not_words=set()
+    fixed_letters=[None, None, None, None, None]
+
+    while None in fixed_letters:
+        current_guess = get_best_word(current_words)
+        print(f"\nTry '{current_guess}'\n")
+
+        res = get_input(f"Was {current_guess} valid? (y/n): ", {"y", "n"})
+        if res == "y":
+            for i in range(5):
+                res = get_input(f"Result for '{current_guess[i]}' (b/g/y): ", {"b", "g", "y"})
+                if res == "b":
+                    known_not_letters.add(current_guess[i])
+                elif res == "g":
+                    known_letters.add(current_guess[i])
+                    fixed_letters[i] = current_guess[i]
+                elif res == "y":
+                    known_letters.add(current_guess[i])
+                else:
+                    raise Exception("Enter b, g, or y")
+        elif res == "n":
+            known_not_words.add(current_guess)
+        else:
+            raise Exception("Enter y, or n")
+
+        current_words = filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, current_words)
+
+    print("SUCCESS!!")
+
+play()
