@@ -48,8 +48,6 @@ def get_best_word(letters_by_rank, possible_words):
 def filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, words_to_filter):
     out = []
 
-    print(known_not_words)
-
     for word in words_to_filter:
         if word in known_not_words:
             continue
@@ -68,21 +66,12 @@ def filter_words(known_letters, known_not_letters, known_not_words, fixed_letter
 
     return out
 
-words_we_care_about = get_initial_words()
-ranked_letters = get_letters_by_rank(words_we_care_about)
-# print(get_best_word(ranked_letters, words_we_care_about))
-
-known = {"r", "s", "e"}
-known_not_letters = {"a", "t", "o", "p", "u"}
-fixed = [None, None, None, None, "e"]
-not_words = ["arose", "aster", "hirse"]
-
 words_we_care_about = filter_words(
-    known_letters={"r", "s", "e"},
-    known_not_letters={"a", "t", "o", "p", "u"},
-    known_not_words={"arose", "aster", "hirse"},
-    fixed_letters=[None, None, None, None, "e"],
-    words_to_filter=words_we_care_about
+    known_letters={},
+    known_not_letters={},
+    known_not_words={},
+    fixed_letters=[None, None, None, None, None],
+    words_to_filter=get_initial_words()
 )
 ranked_letters = get_letters_by_rank(words_we_care_about)
 print(get_best_word(ranked_letters, words_we_care_about))
