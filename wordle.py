@@ -1,74 +1,61 @@
-import string
+import os
+from typing import Dict, List, Set, Union
 
-def get_initial_words():
-    words = []
+def get_initial_words() -> Dict[str, int]:
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-    with open("/usr/share/dict/words") as f:
+    words_by_frequency: Dict[str, int] = {}
+
+    with open(os.path.join(__location__, 'google-books-common-words.txt')) as f:
         for row in f.readlines():
-            words.append(row.replace("\n", ""))
+            word, frequency = row.split('\t')
+            if len(word) == 5:
+                words_by_frequency[word.lower()] = int(frequency)
+        print(words_by_frequency["which"])
 
-    out = []
+    return words_by_frequency
 
-    for word in words:
-        if len(word) == 5:
-            if word[0].islower():
-                out.append(word)
+def filter_words(known_letters: Set[str], known_not_letters: Set[str], known_not_words: Set[str], fixed_letters: List[Union[str, None]], words_to_filter: Dict[str, int]) -> Dict[str, int]:
+    out: Dict[str, int] = {}
 
-    return out
-
-def filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, words_to_filter):
-    out = []
-
-    for word in words_to_filter:
+    for word, tally in words_to_filter.items():
+        print(word, tally)
         if word in known_not_words:
             continue
+        print(word, tally)
         good = True
         for letter in known_letters:
             if letter not in word:
                 good = False
+        print(good)
         for letter in known_not_letters:
             if letter in word:
                 good = False
+        print(good)
         for ind, letter in enumerate(fixed_letters):
             if letter is not None and word[ind] != letter:
                 good = False
+        print(good)
         if good:
-            out.append(word)
+            out[word] = tally
 
     return out
 
-def get_letters_by_rank(words):
-    letter_tallies = {}
-
-    for letter in string.ascii_lowercase:
-        letter_tallies[letter] = 0
-
-    for word in words:
-        for char in word:
-            letter_tallies[char.lower()] += 1
-
-    return [item[0] for item in sorted(letter_tallies.items(), key=lambda x: x[1])]
-
-def get_best_word(possible_words):
-    letters_by_rank = get_letters_by_rank(possible_words)
+def get_best_word(possible_words: Dict[str, int]) -> str:
 
     best_word = ""
     best_word_score = 0
 
-    for word in possible_words:
-        score = 0
-        already_scored_letters = set()
-        for character in word:
-            if character not in already_scored_letters:
-                score += letters_by_rank.index(character)
-                already_scored_letters.add(character)
-
-        if score > best_word_score:
+    for word, tally in possible_words.items():
+        if word == "which":
+            print(tally, word)
+        if tally > best_word_score:
+            best_word_score = tally
             best_word = word
-            best_word_score = score
+
     return best_word
 
-def get_input(prompt, allowed_values):
+def get_input(prompt: str, allowed_values: Set[str]) -> str:
     result = input(prompt)
     while result not in allowed_values:
         print("Invalid value\n")
@@ -77,12 +64,13 @@ def get_input(prompt, allowed_values):
 
 def play():
     current_words = get_initial_words()
-    known_letters = set()
-    known_not_letters=set()
-    known_not_words=set()
-    fixed_letters=[None, None, None, None, None]
+    known_letters: Set[str] = set()
+    known_not_letters: Set[str] = set()
+    known_not_words: Set[str] = set()
+    fixed_letters: List[Union[str, None]] = [None, None, None, None, None]
 
     while None in fixed_letters:
+        print(known_letters, known_not_letters, known_not_words, fixed_letters)
         current_guess = get_best_word(current_words)
         print(f"\nTry '{current_guess}'\n")
 
@@ -108,4 +96,8 @@ def play():
 
     print("\nSUCCESS!!")
 
-play()
+# play()
+
+current_words = get_initial_words()
+# print(filter_words({'c', 'w', 'h'}, {'i', 'h'}, set(), ['w', 'h', None, 'c', None], current_words))
+print(filter_words({'c', 'w', 'h'}, set(), set(), [None, None, None, None, None], current_words))
