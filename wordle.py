@@ -1,6 +1,6 @@
 import os
 import string
-from typing import Dict, List, Set, Tuple
+from typing import Callable, Dict, List, Set, Tuple
 
 def get_initial_words() -> Dict[str, int]:
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -19,8 +19,8 @@ def filter_words(
     known_letters: Set[str],
     known_not_letters: Set[str],
     known_not_words: Set[str],
-    fixed_letters: List[Tuple[int, str]],
-    fixed_not_letters: List[Tuple[int, str]],
+    fixed_letters: Set[Tuple[int, str]],
+    fixed_not_letters: Set[Tuple[int, str]],
     words_to_filter: Dict[str, int],
 ) -> Dict[str, int]:
     out: Dict[str, int] = {}
@@ -89,9 +89,9 @@ def get_best_word(possible_words: Dict[str, int]) -> str:
 
     return best_word
 
-def get_input(prompt: str, allowed_values: Set[str]) -> str:
+def get_input(prompt: str, input_validator: Callable[[str], bool]) -> str:
     result = input(prompt)
-    while result not in allowed_values:
+    while not input_validator(result):
         print("Invalid value\n")
         result = input(prompt)
     return result
@@ -101,27 +101,27 @@ def play():
     known_letters: Set[str] = set()
     known_not_letters: Set[str] = set()
     known_not_words: Set[str] = set()
-    fixed_letters: List[Tuple[int, str]] = []
-    fixed_not_letters: List[Tuple[int, str]] = []
+    fixed_letters: Set[Tuple[int, str]] = set()
+    fixed_not_letters: Set[Tuple[int, str]] = set()
 
     current_guess: str = get_best_first_word(current_words)
 
     while len(fixed_letters) < 5:
         print(f"\nTry '{current_guess}'\n")
 
-        res = get_input(f"Was {current_guess} valid? (y/n): ", {"y", "n"})
+        res = get_input(f"Was {current_guess} valid? (y/n): ", lambda x: x in ['y', 'n'])
         if res == "y":
             want_to_add_to_known_not_letters: Set[str] = set()
-            for i in range(5):
-                res = get_input(f"Result for '{current_guess[i]}' (b/g/y): ", {"b", "g", "y"})
-                if res == "b":
+            res = get_input(f"Result for '{current_guess}' (5 x b/g/y): ", lambda x: all(c in ['b', 'g', 'y'] for c in x) and len(x) == 5)
+            for i, char_res in enumerate(res):
+                if char_res == "b":
                     want_to_add_to_known_not_letters.add(current_guess[i])
-                elif res == "g":
+                elif char_res == "g":
                     known_letters.add(current_guess[i])
-                    fixed_letters.append((i, current_guess[i]))
-                elif res == "y":
+                    fixed_letters.add((i, current_guess[i]))
+                elif char_res == "y":
                     known_letters.add(current_guess[i])
-                    fixed_not_letters.append((i, current_guess[i]))
+                    fixed_not_letters.add((i, current_guess[i]))
                 else:
                     raise Exception("Enter b, g, or y")
             # Do this last as a letter can appear multiple times in a word, with different responses
