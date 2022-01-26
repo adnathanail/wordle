@@ -109,10 +109,11 @@ def play():
     while len(fixed_letters) < 5:
         print(f"\nTry '{current_guess}'\n")
 
-        res = get_input(f"Was {current_guess} valid? (y/n): ", lambda x: x in ['y', 'n'])
-        if res == "y":
+        res = get_input(f"Result for '{current_guess}' (5 x b/g/y OR i): ", lambda x: (all(c in ['b', 'g', 'y'] for c in x) and len(x) == 5) or x == "i")
+        if res == "i":
+            known_not_words.add(current_guess)
+        else:
             want_to_add_to_known_not_letters: Set[str] = set()
-            res = get_input(f"Result for '{current_guess}' (5 x b/g/y): ", lambda x: all(c in ['b', 'g', 'y'] for c in x) and len(x) == 5)
             for i, char_res in enumerate(res):
                 if char_res == "b":
                     want_to_add_to_known_not_letters.add(current_guess[i])
@@ -129,10 +130,6 @@ def play():
             for letter in want_to_add_to_known_not_letters:
                 if letter not in known_letters:
                     known_not_letters.add(letter)
-        elif res == "n":
-            known_not_words.add(current_guess)
-        else:
-            raise Exception("Enter y, or n")
 
         current_words = filter_words(known_letters, known_not_letters, known_not_words, fixed_letters, fixed_not_letters, current_words)
         current_guess = get_best_word(current_words)
