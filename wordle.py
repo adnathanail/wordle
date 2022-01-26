@@ -76,10 +76,11 @@ def play():
 
         res = get_input(f"Was {current_guess} valid? (y/n): ", {"y", "n"})
         if res == "y":
+            want_to_add_to_known_not_letters: Set[str] = set()
             for i in range(5):
                 res = get_input(f"Result for '{current_guess[i]}' (b/g/y): ", {"b", "g", "y"})
                 if res == "b":
-                    known_not_letters.add(current_guess[i])
+                    want_to_add_to_known_not_letters.add(current_guess[i])
                 elif res == "g":
                     known_letters.add(current_guess[i])
                     fixed_letters[i] = current_guess[i]
@@ -87,6 +88,11 @@ def play():
                     known_letters.add(current_guess[i])
                 else:
                     raise Exception("Enter b, g, or y")
+            # Do this last as a letter can appear multiple times in a word, with different responses
+            # E.g. WHICH with a response of GGBGB would add H to both known_letters and known_not_letters
+            for letter in want_to_add_to_known_not_letters:
+                if letter not in known_letters:
+                    known_not_letters.add(letter)
         elif res == "n":
             known_not_words.add(current_guess)
         else:
@@ -96,8 +102,4 @@ def play():
 
     print("\nSUCCESS!!")
 
-# play()
-
-current_words = get_initial_words()
-# print(filter_words({'c', 'w', 'h'}, {'i', 'h'}, set(), ['w', 'h', None, 'c', None], current_words))
-print(filter_words({'c', 'w', 'h'}, set(), set(), [None, None, None, None, None], current_words))
+play()
