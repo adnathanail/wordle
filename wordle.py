@@ -116,6 +116,7 @@ def play():
             want_to_add_to_known_not_letters: Set[str] = set()
             for i, char_res in enumerate(res):
                 if char_res == "b":
+                    fixed_not_letters.add((i, current_guess[i]))
                     want_to_add_to_known_not_letters.add(current_guess[i])
                 elif char_res == "g":
                     known_letters.add(current_guess[i])
